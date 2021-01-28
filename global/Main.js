@@ -1,5 +1,26 @@
 // var Person = require("../src/fake_actor/Person");
 
+//工具和类型定义
+var currentProject = "Slots";
+var ERROR_TIP_PREFIX = currentProject +
+	" "+ "项目自动测试工具提示" +
+	"：\n";
+var UserInterfaceType = {
+	TYPE_BUTTON: 0
+};
+var InterfacePriorityType = {
+	TYPE_PRIORITY_UNKNOWN: 0,
+	TYPE_PRIORITY_SYSTEM_IN: 1,
+	TYPE_PRIORITY_SYSTEM_OUT: 2,
+	TYPE_PRIORITY_SYSTEM_CONTEXT: 3,
+	TYPE_PRIORITY_IN_TEST_IN: 4,
+	TYPE_PRIORITY_IN_TEST_OUT: 5,
+	TYPE_PRIORITY_IN_TEST_CONTEXT: 6
+};
+var UserPersonType = {
+	TYPE_PERSON_STUPID_CHILD: 0,
+	TYPE_PERSON_STUPID_ADULT: 1
+};
 var isUserVisible = function(node, first) {
 	//传入必须是node类型
 	if(!(node instanceof cc.Node)) {
@@ -28,27 +49,18 @@ var isUserVisible = function(node, first) {
 		return true;
 	}
 };
-UserInterfaceType = {
-	TYPE_BUTTON: 0
-};
-InterfacePriorityType = {
-	TYPE_PRIORITY_UNKNOWN: 0,
-	TYPE_PRIORITY_SYSTEM_IN: 1,
-	TYPE_PRIORITY_SYSTEM_OUT: 2,
-	TYPE_PRIORITY_SYSTEM_CONTEXT: 3,
-	TYPE_PRIORITY_IN_TEST_IN: 4,
-	TYPE_PRIORITY_IN_TEST_OUT: 5,
-	TYPE_PRIORITY_IN_TEST_CONTEXT: 6
-};
-UserPersonType = {
-	TYPE_PERSON_STUPID_CHILD: 0,
-	TYPE_PERSON_STUPID_ADULT: 1
-};
-
-var listenersMap = cc.eventManager._listenersMap["__cc_touch_one_by_one"];
-var listeners = listenersMap._sceneGraphListeners;
 
 var getCurrentInterfaceButton = function() {
+	var listenersMap = cc.eventManager._listenersMap["__cc_touch_one_by_one"];
+	if (!listenersMap) {
+		cc.error(ERROR_TIP_PREFIX+"目前没有可用的button操作！");
+		return;
+	}
+	var listeners = listenersMap._sceneGraphListeners;
+	if (!listeners || !listeners.length) {
+		cc.error(ERROR_TIP_PREFIX+"目前没有可用的button操作！");
+		return;
+	}
 	var userButtons = [];
 	listeners.forEach(function(listener){
 		var menuNode = listener._node;
