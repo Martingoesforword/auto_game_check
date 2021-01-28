@@ -102,8 +102,18 @@ var userDoOneTouch = function(personType) {
 	nextAction();
 };
 
+var checkGameDataAndUI = function() {
+
+};
+
 var updateUserActionFrame = function(personType) {
+	//行动前检测
+	checkGameDataAndUI();
+
 	userDoOneTouch(personType);
+
+	//行动后检测
+	checkGameDataAndUI();
 };
 
 var comeOneUser = function(personType) {
