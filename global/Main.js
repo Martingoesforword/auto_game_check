@@ -28,7 +28,9 @@ var isUserVisible = function(node, first) {
 		return true;
 	}
 };
-
+UserInterfaceType = {
+	TYPE_BUTTON: 0
+};
 InterfacePriorityType = {
 	TYPE_PRIORITY_UNKNOWN: 0,
 	TYPE_PRIORITY_SYSTEM_IN: 1,
@@ -37,6 +39,10 @@ InterfacePriorityType = {
 	TYPE_PRIORITY_IN_TEST_IN: 4,
 	TYPE_PRIORITY_IN_TEST_OUT: 5,
 	TYPE_PRIORITY_IN_TEST_CONTEXT: 6
+};
+UserPersonType = {
+	TYPE_PERSON_STUPID_CHILD: 0,
+	TYPE_PERSON_STUPID_ADULT: 1
 };
 
 var listenersMap = cc.eventManager._listenersMap["__cc_touch_one_by_one"];
@@ -60,33 +66,52 @@ var getCurrentInterfaceButton = function() {
 	return userButtons;
 };
 
-var getCurrentUserToDoAction = function(userButtons) {
-	//通过 优先级，层级，等等来选出下一个操作
+var stupidChildAction = function(userInterface) {
+	//通过 优先级，层级，用户类型，交互类型 等等来选出下一个操作
 	// var userButtonPriority = userButton.priority;
 	// var userDisabled = userButton.enabled;
+	var userButtons = userInterface[UserInterfaceType.TYPE_BUTTON];
 	return function(){
-		userButtons[1].activate();
+		userButtons[1] && userButtons[1].activate && userButtons[1].activate();
 	};
 };
 
-var userDoOneTouch = function() {
-	var userButtons = getCurrentInterfaceButton();
-	var nextAction = getCurrentUserToDoAction(userButtons);
-	nextAction();
-}
+var getCurrentUserToDoAction = function(userInterface, personType) {
+	switch (personType) {
+		case UserPersonType.TYPE_PERSON_STUPID_CHILD: {
+			stupidChildAction(userInterface);
+			break;
+		}
+		case UserPersonType.TYPE_PERSON_STUPID_ADULT: {
+			break;
+		}
+		default: {
+			break;
+		}
+	}
+};
 
-var updateUserActionFrame = function() {
-	var userButtons = getCurrentInterfaceButton();
-	var nextAction = getCurrentUserToDoAction(userButtons);
+var buildCurrentUserAllInterface = function(userInterface) {
+	userInterface[UserInterfaceType.TYPE_BUTTON] = getCurrentInterfaceButton();
+};
+
+var userDoOneTouch = function(personType) {
+	var userInterface = {};
+	buildCurrentUserAllInterface(userInterface);
+	var nextAction = getCurrentUserToDoAction(userInterface, personType);
 	nextAction();
 };
 
-var comeOneUser = function() {
+var updateUserActionFrame = function(personType) {
+	userDoOneTouch(personType);
+};
+
+var comeOneUser = function(personType) {
 	// setInterval(updateUserActionMinFrame, 100);
-	setInterval(updateUserActionFrame, 2000);
+	setInterval(updateUserActionFrame, 2000, personType);
 };
 
-comeOneUser();
+// comeOneUser(personType);
 
 
 // for (var i = 0; i < listeners.length; i++) {
