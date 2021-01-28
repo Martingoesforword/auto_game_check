@@ -2,9 +2,7 @@
 
 //工具和类型定义
 var currentProject = "Slots";
-var ERROR_TIP_PREFIX = currentProject +
-	" "+ "项目自动测试工具提示" +
-	"：\n";
+var ERROR_TIP_PREFIX = currentProject + " "+ "项目自动测试工具提示" + "：\n";
 var UserInterfaceType = {
 	TYPE_BUTTON: 0
 };
@@ -50,6 +48,18 @@ var isUserVisible = function(node, first) {
 	}
 };
 
+//定义用户类型的行动
+var stupidChildAction = function(userInterface) {
+	//通过 优先级，层级，用户类型，交互类型 等等来选出下一个操作
+	// var userButtonPriority = userButton.priority;
+	// var userDisabled = userButton.enabled;
+	var userButtons = userInterface[UserInterfaceType.TYPE_BUTTON];
+	return function(){
+		userButtons[1] && userButtons[1].activate && userButtons[1].activate();
+	};
+};
+
+//获取交互类型集合：按钮交互类型
 var getCurrentInterfaceButton = function() {
 	var listenersMap = cc.eventManager._listenersMap["__cc_touch_one_by_one"];
 	if (!listenersMap) {
@@ -77,17 +87,6 @@ var getCurrentInterfaceButton = function() {
 	userButtons.reverse();
 	return userButtons;
 };
-
-var stupidChildAction = function(userInterface) {
-	//通过 优先级，层级，用户类型，交互类型 等等来选出下一个操作
-	// var userButtonPriority = userButton.priority;
-	// var userDisabled = userButton.enabled;
-	var userButtons = userInterface[UserInterfaceType.TYPE_BUTTON];
-	return function(){
-		userButtons[1] && userButtons[1].activate && userButtons[1].activate();
-	};
-};
-
 var getCurrentUserToDoAction = function(userInterface, personType) {
 	switch (personType) {
 		case UserPersonType.TYPE_PERSON_STUPID_CHILD: {
@@ -102,11 +101,16 @@ var getCurrentUserToDoAction = function(userInterface, personType) {
 		}
 	}
 };
-
 var buildCurrentUserAllInterface = function(userInterface) {
 	userInterface[UserInterfaceType.TYPE_BUTTON] = getCurrentInterfaceButton();
 };
 
+//定义检测功能
+var checkGameDataAndUI = function() {
+
+};
+
+//定义用户的一次交互行动
 var userDoOneTouch = function(personType) {
 	var userInterface = {};
 	buildCurrentUserAllInterface(userInterface);
@@ -114,20 +118,19 @@ var userDoOneTouch = function(personType) {
 	nextAction();
 };
 
-var checkGameDataAndUI = function() {
-
-};
-
+//定义行动帧
 var updateUserActionFrame = function(personType) {
 	//行动前检测
 	checkGameDataAndUI();
 
+	//瞬时行动
 	userDoOneTouch(personType);
 
 	//行动后检测
 	checkGameDataAndUI();
 };
 
+//定义测试行为
 var comeOneUser = function(personType) {
 	// setInterval(updateUserActionMinFrame, 100);
 	setInterval(updateUserActionFrame, 2000, personType);
