@@ -47,6 +47,37 @@ var isUserVisible = function(node, first) {
 		return true;
 	}
 };
+var isFatherNode = function(fatherNode, node) {
+	if(!fatherNode || !node) return false;
+	if(node && node.parent === fatherNode) {
+		return true;
+	}
+	if(node && node.parent) {
+		return isFatherNode(fatherNode, node.parent);
+	}
+	return false;
+};
+var isInNowInterfaceUI = function(node, interfaceUIs) {
+	var ui = interfaceUIs && interfaceUIs[0];
+	if(isFatherNode(ui, node)) {
+		return true;
+	}
+	return false;
+};
+
+var buildCurrentInterfaceUIs = function() {
+	var interfaceUIs = [];
+	var sceneUI = game.uIHelper.getRunningScene();
+	if(sceneUI) {
+		interfaceUIs.push(sceneUI);
+	}
+	var dialogUIs = game.util.clone(game.dialogManager._dialogStack);
+	if(dialogUIs && dialogUIs.length) {
+		interfaceUIs = interfaceUIs.concat(dialogUIs);
+	}
+	interfaceUIs.reverse();
+	return interfaceUIs;
+}
 
 //定义用户类型的行动
 var stupidChildAction = function(userInterface) {
@@ -54,8 +85,18 @@ var stupidChildAction = function(userInterface) {
 	// var userButtonPriority = userButton.priority;
 	// var userDisabled = userButton.enabled;
 	var userButtons = userInterface[UserInterfaceType.TYPE_BUTTON];
+	var interfaceUIs = buildCurrentInterfaceUIs();
+	for (var index in userButtons) {
+		var button = userButtons[index];
+		if(isInNowInterfaceUI(button, interfaceUIs) && button.activate && !button.activated) {
+			return function(){
+				button.activated = 1;
+				button.activate();
+			};
+		}
+	}
 	return function(){
-		userButtons[1] && userButtons[1].activate && userButtons[1].activate();
+		cc.error(ERROR_TIP_PREFIX+"目前没有当前UI用户区的按钮");
 	};
 };
 
@@ -138,10 +179,10 @@ var updateUserActionFrame = function(personType) {
 //定义测试行为
 var comeOneUser = function(personType) {
 	// setInterval(updateUserActionMinFrame, 100);
-	setInterval(updateUserActionFrame, 2000, personType);
+	setInterval(updateUserActionFrame, 4000, personType);
 };
 
-// comeOneUser(personType);
+comeOneUser(UserPersonType.TYPE_PERSON_STUPID_CHILD);
 
 
 // for (var i = 0; i < listeners.length; i++) {
