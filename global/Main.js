@@ -88,9 +88,13 @@ var getCurrentInterfaceButton = function() {
 	return userButtons;
 };
 var getCurrentUserToDoAction = function(userInterface, personType) {
+	var innerAction = null;
+	var action = function(){
+		innerAction && innerAction();
+	}
 	switch (personType) {
 		case UserPersonType.TYPE_PERSON_STUPID_CHILD: {
-			stupidChildAction(userInterface);
+			innerAction = stupidChildAction(userInterface);
 			break;
 		}
 		case UserPersonType.TYPE_PERSON_STUPID_ADULT: {
@@ -100,6 +104,7 @@ var getCurrentUserToDoAction = function(userInterface, personType) {
 			break;
 		}
 	}
+	return action;
 };
 var buildCurrentUserAllInterface = function(userInterface) {
 	userInterface[UserInterfaceType.TYPE_BUTTON] = getCurrentInterfaceButton();
